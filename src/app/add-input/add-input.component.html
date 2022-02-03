@@ -1,1 +1,47 @@
-<p>add-input works!</p>
+
+{{expiry}}
+{{lot}}
+{{strikeprice}}
+{{pe_ce}}
+{{buy_sell}}
+
+<h1>
+    {{margin}}
+
+</h1>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+<table>
+    <tr>
+        <td>Expiry</td>
+        <td>Strike Price</td>
+        <td>PE / CE</td>
+        <td>Lot</td>
+        <td>Buy / Sell</td>
+    </tr>
+    <tr>
+        <td><input type ='text' (keyup)=getExpiry($event)></td>
+        <td>
+            <input type='submit' value='-' (click)=reduceStrike()>
+            <input type = 'number'(keyup)=getStrike($event) value = {{strikeprice}}>
+            <input type='submit' value='+' (click)=increaseStrike()>
+        </td>
+        <td><select (change)=getPeCe($event)><option>PE</option><option>CE</option></select></td>
+        <td>
+            <select (change)=getLot($event)>
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+        </td>
+        <td><select (change)=getBuySell($event)><option>BUY</option><option>SELL</option></select></td>
+    </tr>
+</table>
+
+<input type='submit' value='Submit' (click)=getApiData()>
