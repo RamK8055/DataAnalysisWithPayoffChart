@@ -20,6 +20,11 @@ export class AddInputComponent implements OnInit {
 
   total: number = 0
 
+  
+  isLoading: boolean = false;
+  options : any = this.apiService.getChartData()
+
+  
   constructor(private apiService: ApiServicesService) { }
 
 
@@ -140,4 +145,7 @@ export class AddInputComponent implements OnInit {
     //add new input
     // trigger calc
   }
+
+
+
 }
