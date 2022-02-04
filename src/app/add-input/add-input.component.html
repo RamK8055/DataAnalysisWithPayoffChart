@@ -9,38 +9,64 @@
     {{margin}}
 
 </h1>
+NIFTY is : <<>>
 <br>
 <br>
 <br>
-<br>
-<br>
-<br>
-<br>
+<div id='oc'>
+    <table>
+        <tr><td>CE LTP</td><td></td><td>STRIKE</td><td>PE LTP</td><td></td></tr>
+        <tr  *ngFor="let a of optionChain(); let index = index">
+            <!-- <tr> -->
+                <td>{{a}}</td>
+            <td>
+                <!-- <input type='submit' value='B' (click)='positionAdd(index,CE,BUY)''> -->
+                <input type='submit' value='B' (click)='positionAdd(index,"CE","BUY")'>
+                <input type='submit' value='S' (click)='positionAdd(index,"CE","SELL")'>
+            </td>
+            <td> {{index}} </td>
+            <td>{{a}}</td>
+            <td>
+                <input type='submit' value='B' (click)='positionAdd(index,"PE","BUY")'>
+                <input type='submit' value='S' (click)='positionAdd(index,"PE","SELL")'>
+            </td>
+        </tr>
+    </table>
+</div>
 
 
+<input type='submit' value='Add Position' (click)=addPosition()>
+<input type='submit' value='Add Dummy data' (click)=addTest()>
 
-<table>
+<table >
     <tr>
+        <td></td>
         <td>Expiry</td>
         <td>Strike Price</td>
         <td>PE / CE</td>
         <td>Lot</td>
         <td>Buy / Sell</td>
+        <td></td>
     </tr>
-    <tr>
-        <td><input type ='text' (keyup)=getExpiry($event)></td>
+    <tr  *ngFor="let a of createRange(); let index = index">
+        <td><input type = 'checkbox' (change)=isSelectedRow(index) checked></td>
+        <td><input type ='text' (keyup)=getExpiry($event,index)></td>
         <td>
-            <input type='submit' value='-' (click)=reduceStrike()>
-            <input type = 'number'(keyup)=getStrike($event) value = {{strikeprice}}>
-            <input type='submit' value='+' (click)=increaseStrike()>
+            <input type='submit' value='-' (click)=reduceStrike(index)>
+            <input type = 'number'(keyup)=getStrike($event,index) value = {{strikeprice[index]}}>
+            <input type='submit' value='+' (click)=increaseStrike(index)>
         </td>
-        <td><select (change)=getPeCe($event)><option>PE</option><option>CE</option></select></td>
+        <td><select (change)=getPeCe($event,index)><option>PE</option><option>CE</option></select></td>
         <td>
-            <select (change)=getLot($event)>
+            <!-- change pe/ce & buy sell as radio box, lot with +,- like strike -->
+            <select (change)=getLot($event,index)>
                 <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
             </select>
         </td>
-        <td><select (change)=getBuySell($event)><option>BUY</option><option>SELL</option></select></td>
+        <td><select (change)=getBuySell($event,index)><option>BUY</option><option>SELL</option></select></td>
+        <td>
+            <input type='submit' value='DELETE' (click)=deleteRow(index)>
+        </td>
     </tr>
 </table>
 
