@@ -1,3 +1,5 @@
+<!-- <input type = 'submit' value = 'test button' (click) = 'testMethod()'> -->
+{{optionChainData}}
 
 {{expiry}}
 {{lot}}
@@ -10,6 +12,12 @@
 
 </h1>
 NIFTY is : <<>>
+
+<select>
+    <option>Select Expiry</option>
+    <option *ngFor = "let exp of contract; let index = index">{{exp}}</option>
+
+</select>
 <br>
 <br>
 <br>

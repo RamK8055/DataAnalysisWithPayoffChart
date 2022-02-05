@@ -1,51 +1,55 @@
 import { Component, OnInit } from '@angular/core';
+
 import { ApiServicesService } from '../api-services.service';
+import { ChartsService } from '../charts.service'
 
 @Component({
   selector: 'app-add-input',
   templateUrl: './add-input.component.html',
   styleUrls: ['./add-input.component.css']
 })
-export class AddInputComponent implements OnInit {
 
+export class AddInputComponent implements OnInit {
   
+  optionChainData: any;
+
+  constructor(
+    private apiService: ApiServicesService,
+    private chartsService: ChartsService
+  ) { }
+  
+  ngOnInit(): void {
+    this.getOptionChain();
+    //add validation to check price of option chain
+  }
+
+  contract: string[]  = []
   margin: string = '';
-  
-  
   expiry: string[] = []
   lot: string[] = []
   strikeprice: number[] = []
   pe_ce : string[] = []
   buy_sell: string[] = []
-
   total: number = 0
-
   
   isLoading: boolean = false;
-  options : any = this.apiService.getChartData()
+  options : any = this.chartsService.getChartData()
+  testAns: string = ''
+
+  //call on page-load
+  getOptionChain(){
+    this.apiService.getOptionChainData().then((data)=>{
+      this.optionChainData = JSON.stringify(data);
+    })
+  }
+
+
+
+
+
+
 
   
-  constructor(private apiService: ApiServicesService) { }
-
-
-  ngOnInit(): void {
-  }
-
-
-  //NOTE: This method is just for learning purpose
-  syncAndAsync(){
-    this.apiService.syncMethod().then((data)=>{ 
-        /* Setting value here */ 
-        var a = data; 
-        console.log(a)
-    });
-    console.log("after sync")
-    var b = this.apiService.asyncMethod()
-    console.log(b)
-    console.log("after aync")
-  }
-
-
 
   getExpiry(event: any, index: number){
     this.expiry[index] = event.target.value
