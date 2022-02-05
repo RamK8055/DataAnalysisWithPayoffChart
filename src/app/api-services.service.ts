@@ -12,27 +12,44 @@ export class ApiServicesService {
   
 
   //This is sync method, so use promise and resolve it instead of return and handle with .then() in calling place
-  public getOptionChainData(){
-    const url = environment.apiEndPoint + '/optionchain'
+  public getApiData(body: string){
+    const url = environment.apiEndPoint + '/calculate'
     return new Promise((resolve, reject) =>{
-      var result = this.httpClient.get(url).subscribe((data) =>{
-        console.log(data)
-        resolve(JSON.stringify(data));  
+      var result = this.httpClient.post(url,body).subscribe((data) =>{
+        resolve( JSON.stringify(data));  
         //NOTE: Instead of return use resolve in promise (also change calling method)
       })
     })
   }
 
-  public getApiData(body: string){
-    const url = environment.apiEndPoint + '/calculate'
+  public listExpiries(){
+    const url = environment.apiEndPoint + '/expiries'
     return new Promise((resolve, reject) =>{
-      var result = this.httpClient.post(url,body).subscribe((data) =>{
-        console.log(data)
-        resolve( JSON.stringify(data));  
+      var result = this.httpClient.get(url).subscribe((data) =>{
+        resolve(JSON.parse(JSON.stringify(data)));  
       })
     })
   }
 
+  public getNifytValue(){
+    const url = environment.apiEndPoint + '/nifty'
+    return new Promise((resolve, reject) =>{
+      var result = this.httpClient.get(url).subscribe((data) =>{
+        resolve(data);  
+      })
+    })
+  }
   
+  public getOptionForExpiry(body:string, strike:number[], ce:number[], pe: number[]){
+    const url = environment.apiEndPoint + '/getexpiry'
+    return new Promise((resolve, reject) =>{
+      var result = this.httpClient.post(url,body).subscribe((data) =>{
+        pe = JSON.parse(JSON.stringify(data)).PE
+        ce = JSON.parse(JSON.stringify(data)).CE
+        strike = JSON.parse(JSON.stringify(data)).STRIKE
+        resolve({strike, ce, pe});  
+      })
+    })
+  }
 }
 

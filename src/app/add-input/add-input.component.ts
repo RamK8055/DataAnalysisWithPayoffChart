@@ -11,7 +11,8 @@ import { ChartsService } from '../charts.service'
 
 export class AddInputComponent implements OnInit {
   
-  optionChainData: any;
+  expiryInDropDown: string[] = [];
+  nifty: string = '';
 
   constructor(
     private apiService: ApiServicesService,
@@ -19,38 +20,86 @@ export class AddInputComponent implements OnInit {
   ) { }
   
   ngOnInit(): void {
-    this.getOptionChain();
+    this.getlistExpiries();
+    this.getNifty();
     //add validation to check price of option chain
   }
 
-  contract: string[]  = []
-  margin: string = '';
+  //For option chain
+  ce : number[] = []
+  pe : number[] = []
+  strike : number[] = []
+
+  selectedExpiry: string = ''
+
+  //List data for positions
+  total: number = 0
   expiry: string[] = []
   lot: string[] = []
-  strikeprice: number[] = []
   pe_ce : string[] = []
   buy_sell: string[] = []
-  total: number = 0
+  strikeprice: number[] = []
+
+  //Resultant data 
+  margin: string = '';
   
+  //For charting
   isLoading: boolean = false;
   options : any = this.chartsService.getChartData()
   testAns: string = ''
 
-  //call on page-load
-  getOptionChain(){
-    this.apiService.getOptionChainData().then((data)=>{
-      this.optionChainData = JSON.stringify(data);
+  //---- PAGE ON LOAD ---//
+  // Getting option chain data
+  getlistExpiries(){
+    this.apiService.listExpiries().then((data)=>{
+      this.expiryInDropDown = JSON.parse(JSON.stringify(data));
     })
   }
 
+  getNifty(){
+    this.apiService.getNifytValue().then((data)=>{
+      this.nifty = JSON.stringify(data);
+    })
+  }
+
+  //---- Expiry change in drop down ---//
+  changeExpiry(event: any){
+    this.selectedExpiry = event.target.value;
+    this.apiService.getOptionForExpiry(event.target.value, this.strike, this.ce, this.pe)
+      .then((data)=>{
+        this.strike = JSON.parse(JSON.stringify(data)).strike;
+        this.ce =  JSON.parse(JSON.stringify(data)).ce;
+        this.pe =  JSON.parse(JSON.stringify(data)).pe;
+      });
+  }
+
+  //--- Option chain activity ---//
+  // Buy/Sell button on option chain
+  positionAddorRemove(index:number,pe_ce:string,buy_sell:string){
+    var selectedPeCe;
+    if(pe_ce == 'PE')
+    selectedPeCe = this.pe[index]
+    else
+    selectedPeCe = this.ce[index]
+   
+
+      this.expiry.push(this.selectedExpiry)
+      this.strikeprice.push(this.strike[index])
+      this.lot.push("1")
+      this.pe_ce.push(pe_ce)
+      this.buy_sell.push(buy_sell)
+      this.total++
 
 
-
-
-
-
+    console.log(pe_ce)
+    console.log(buy_sell)
+    console.log(this.selectedExpiry)
+    console.log(this.strike[index])
+    //add new input
+    // trigger calc
+  }
   
-
+  //---- Capture required Data ---// TODO: will use these method??
   getExpiry(event: any, index: number){
     this.expiry[index] = event.target.value
 
@@ -94,15 +143,9 @@ export class AddInputComponent implements OnInit {
     // console.log(this.pe_ce+ " " + this.strikeprice + " " + this.lot)
   }
 
-
-  createRange(){
-    var items: number[] = [];
-    for(var i = 1; i <= this.total; i++){
-      items.push(i);
-    }
-    return items;
-
-    // return ['1','2','3'];
+  //--- FOR POSTION ---//
+  range(){
+    return new Array(this.total);
   }
 
   addPosition(){
@@ -126,7 +169,6 @@ export class AddInputComponent implements OnInit {
 
   }
   addTest(){
-    console.log(this.expiry)
     this.expiry.push("exp")
     this.strikeprice.push(100)
     this.lot.push("2")
@@ -134,21 +176,8 @@ export class AddInputComponent implements OnInit {
     this.buy_sell.push("sell")
     this.total++
   }
-  optionChain(){
-    var items: number[] = [];
-    for(var i = 1; i <= 10; i++){
-      items.push(i*100);
-    }
-    return items;
-  }
 
-  positionAdd(index:number,pe_ce:string,buy_sell:string){
-    console.log(index)
-    console.log(pe_ce)
-    console.log(buy_sell)
-    //add new input
-    // trigger calc
-  }
+
 
 
 

@@ -1,53 +1,80 @@
-<!-- <input type = 'submit' value = 'test button' (click) = 'testMethod()'> -->
-{{optionChainData}}
+<div id="main_div">
+  <div id="left_block">
+    <div id="left_block_top">
+      <table><tr><td>Nifty: {{ nifty }}</td><td>
+        <select (change)="changeExpiry($event)" name="expirys">
+            <option>Select Expiry</option>
+            <option *ngFor="let exp of expiryInDropDown; let index = index">
+              {{ exp }}
+            </option>
+          </select>
 
-{{expiry}}
-{{lot}}
-{{strikeprice}}
-{{pe_ce}}
-{{buy_sell}}
-
-<h1>
-    {{margin}}
-
-</h1>
-NIFTY is : <<>>
-
-<select>
-    <option>Select Expiry</option>
-    <option *ngFor = "let exp of contract; let index = index">{{exp}}</option>
-
-</select>
-<br>
-<br>
-<br>
-<div id='oc'>
-    <table>
-        <tr><td>CE LTP</td><td></td><td>STRIKE</td><td>PE LTP</td><td></td></tr>
-        <tr  *ngFor="let a of optionChain(); let index = index">
-            <!-- <tr> -->
-                <td>{{a}}</td>
-            <td>
-                <!-- <input type='submit' value='B' (click)='positionAdd(index,CE,BUY)''> -->
-                <input type='submit' value='B' (click)='positionAdd(index,"CE","BUY")'>
-                <input type='submit' value='S' (click)='positionAdd(index,"CE","SELL")'>
-            </td>
-            <td> {{index}} </td>
-            <td>{{a}}</td>
-            <td>
-                <input type='submit' value='B' (click)='positionAdd(index,"PE","BUY")'>
-                <input type='submit' value='S' (click)='positionAdd(index,"PE","SELL")'>
-            </td>
+          
+      </td></tr></table>
+      <table>
+        <tr>
+          <th>CE LTP</th>
+          <th>&nbsp;</th>
+          <th>STRIKE</th>
+          <th>&nbsp;</th>
+          <th>PE LTP</th>
         </tr>
     </table>
-</div>
+      <!-- Button to update option chain and check this fucntionality is working on live market?-->
+      <!-- Button to add our current position with entered value (auto fetch from dl dir)-->
 
+      <!-- <select  name = 'expirySelectWindow'> -->
+      
+    </div>
+    <div id="left_block_bottom">
+      <div id="oc">
+        <table>
+         
+          <tr *ngFor="let item of strike; let index = index">
+            <!-- <tr> -->
+            <td>{{ ce[index] }}</td>
+            <td>
+              <!-- <input type='submit' value='B' (click)='positionAdd(index,CE,BUY)''> -->
+              <input
+                type="submit"
+                value="B"
+                id = 'buy'
+                (click)="positionAddorRemove(index, 'CE', 'BUY')"
+              />
+              <input
+                type="submit"
+                value="S"
+                id = 'sell'
+                (click)="positionAddorRemove(index, 'CE', 'SELL')"
+              />
+            </td>
+            <td>{{ strike[index] }}</td>
+            <td>
+              <input
+                type="submit"
+                value="B"
+                id = 'buy'
+                (click)="positionAddorRemove(index, 'PE', 'BUY')"
+              />
+              <input
+                type="submit"
+                value="S"
+                id = 'sell'
+                (click)="positionAddorRemove(index, 'PE', 'SELL')"
+              />
+            </td>
+            <td>{{ pe[index] }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="right_block">
+    <input type="submit" value="Add Position" (click)="addPosition()" />
+    <input type="submit" value="Add Dummy data" (click)="addTest()" />
 
-<input type='submit' value='Add Position' (click)=addPosition()>
-<input type='submit' value='Add Dummy data' (click)=addTest()>
-
-<table >
-    <tr>
+    <table>
+      <tr>
         <td></td>
         <td>Expiry</td>
         <td>Strike Price</td>
@@ -55,33 +82,54 @@ NIFTY is : <<>>
         <td>Lot</td>
         <td>Buy / Sell</td>
         <td></td>
-    </tr>
-    <tr  *ngFor="let a of createRange(); let index = index">
-        <td><input type = 'checkbox' (change)=isSelectedRow(index) checked></td>
-        <td><input type ='text' (keyup)=getExpiry($event,index)></td>
+      </tr>
+      <tr *ngFor="let item of range(); let index = index">
         <td>
-            <input type='submit' value='-' (click)=reduceStrike(index)>
-            <input type = 'number'(keyup)=getStrike($event,index) value = {{strikeprice[index]}}>
-            <input type='submit' value='+' (click)=increaseStrike(index)>
+          <input type="checkbox" (change)="isSelectedRow(index)" checked />
         </td>
-        <td><select (change)=getPeCe($event,index)><option>PE</option><option>CE</option></select></td>
+        <td><input type="text" (keyup)="getExpiry($event, index)" /></td>
         <td>
-            <!-- change pe/ce & buy sell as radio box, lot with +,- like strike -->
-            <select (change)=getLot($event,index)>
-                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-            </select>
+          <input type="submit" value="-" (click)="reduceStrike(index)" />
+          <input
+            type="number"
+            (keyup)="getStrike($event, index)"
+            value="{{ strikeprice[index] }}"
+          />
+          <input type="submit" value="+" (click)="increaseStrike(index)" />
         </td>
-        <td><select (change)=getBuySell($event,index)><option>BUY</option><option>SELL</option></select></td>
         <td>
-            <input type='submit' value='DELETE' (click)=deleteRow(index)>
+          <select (change)="getPeCe($event, index)">
+            <option>PE</option>
+            <option>CE</option>
+          </select>
         </td>
-    </tr>
-</table>
+        <td>
+          <!-- change pe/ce & buy sell as radio box, lot with +,- like strike -->
+          <select (change)="getLot($event, index)">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+        </td>
+        <td>
+          <select (change)="getBuySell($event, index)">
+            <option>BUY</option>
+            <option>SELL</option>
+          </select>
+        </td>
+        <td>
+          <input type="submit" value="DELETE" (click)="deleteRow(index)" />
+        </td>
+      </tr>
+    </table>
 
-<input type='submit' value='Submit' (click)=getApiData()>
+    <input type="submit" value="Submit" (click)="getApiData()" />
 
-
-<div class="button-groups">
+    <!-- <div class="button-groups">
     <button (click)="isLoading=!isLoading" nz-button nzType="default">Toggle Loading</button>
 </div>
-<div echarts [options]="options" [loading]="isLoading" theme="macarons" class="demo-chart"></div>
+<div echarts [options]="options" [loading]="isLoading" theme="macarons" class="demo-chart"></div> -->
+  </div>
+</div>

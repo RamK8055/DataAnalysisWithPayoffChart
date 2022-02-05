@@ -1,0 +1,65 @@
+#main_div{
+  font-family:"Calibri, sans-serif";
+}
+#left_block{
+    float: left;
+    width: 20%;
+}
+#left_block_top{
+}
+#left_block_bottom{
+    height: 650px;
+    overflow: auto;
+}
+#right_block{
+    width:80%;
+}
+
+
+#sell{
+    background: #ffffff;
+    border: 1px solid #484848;
+    border-radius: 2px;
+    color: #484848;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: middle;
+  }
+  
+  #sell:hover,
+  #sell:active {
+    background-color: initial;
+    background-position: 0 0;
+    color: #ffff;
+    background: #ff4646;
+  
+  }
+
+  #buy{
+    background: #ffffff;
+    border: 1px solid #484848;
+    border-radius: 2px;
+    color: #484848;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: middle;
+  }
+  
+  #buy:hover,
+  #buy:active {
+    background-color: initial;
+    background-position: 0 0;
+    color: #ffff;
+    background: #5980ff;
+  
+  }
+
+
