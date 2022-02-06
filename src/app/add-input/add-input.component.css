@@ -1,19 +1,50 @@
 #main_div{
-  font-family:"Calibri, sans-serif";
+  /* font-family:"Calibri, sans-serif"; */
+  font-family: 'Poppins';
+  font-size: 14px;
 }
 #left_block{
     float: left;
     width: 20%;
 }
-#left_block_top{
-}
-#left_block_bottom{
-    height: 650px;
-    overflow: auto;
-}
+
 #right_block{
     width:80%;
 }
+
+#left_in_right_block{
+  height: 650px;
+  overflow: auto;
+}
+#expiry_in_pos{
+  width:20px;
+}
+
+#lot_input{
+  width: 15px
+}
+
+#strike_input{
+  width: 50px;
+}
+
+#expiry_input{
+  width: 100px;
+}
+
+th{
+  text-align: center;
+}
+
+#BUY{
+  width: 50px
+}
+
+#SELL{
+  width: 50px
+}
+
+
 
 
 #sell{
@@ -63,3 +94,30 @@
   }
 
 
+
+  
+#oc_table{
+  width: 300px;
+}
+
+#oc_table th{
+  width: 30%;
+}
+
+#oc_tbody, #oc_thead tr { 
+  display: block;
+  text-align: center; 
+}
+
+
+#oc_tbody {
+  height: 600px;
+  /* width: 350px; */
+  overflow-y: auto;
+  overflow-x: hidden;
+  width:100%;
+}
+
+#oc_thead th:last-child {
+  width: 156px; /* 140px + 16px scrollbar width */
+}
