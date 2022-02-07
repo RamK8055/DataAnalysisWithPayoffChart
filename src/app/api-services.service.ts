@@ -41,7 +41,7 @@ export class ApiServicesService {
   }
   
   public getOptionForExpiry(body:string, strike:number[], ce:number[], pe: number[]){
-    const url = environment.apiEndPoint + '/getexpiry'
+    const url = environment.apiEndPoint + '/getoptiondataforexpiry'
     return new Promise((resolve, reject) =>{
       var result = this.httpClient.post(url,body).subscribe((data) =>{
         pe = JSON.parse(JSON.stringify(data)).PE

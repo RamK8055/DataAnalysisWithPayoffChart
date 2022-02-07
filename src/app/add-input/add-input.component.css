@@ -15,6 +15,11 @@
 #left_in_right_block{
   height: 650px;
   overflow: auto;
+  width: 48%;
+}
+
+#right_in_right_block{
+  width: 20%
 }
 #expiry_in_pos{
   width:20px;
@@ -45,8 +50,21 @@ th{
 }
 
 
+#max_profit{
+  color: green;
+}
 
+#max_loss{
+  color: red;
+}
 
+#true{
+  width: 5px;
+  background-color: blue;
+}
+#false{
+  width: 5px;
+}
 #sell{
     background: #ffffff;
     border: 1px solid #484848;

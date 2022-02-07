@@ -1,3 +1,4 @@
+<!--Give description to each blocks in details-->
 <div id="main_div">
   <div id="left_block">
     <div id="left_block_top">
@@ -16,6 +17,9 @@
                 {{ exp }}
               </option>
             </select>
+          </td>
+          <td>
+              <input type = 'submit' value = 'refresh' (click) = "refreshCurrentExpiry()"/> 
           </td>
         </tr>
       </table>
@@ -43,13 +47,13 @@
                 type="submit"
                 value="B"
                 id="buy"
-                (click)="positionAddorRemove(index, 'CE', 'BUY')"
+                (click)="positionAddFromOC(index, 'CE', 'BUY')"
               />
               <input
                 type="submit"
                 value="S"
                 id="sell"
-                (click)="positionAddorRemove(index, 'CE', 'SELL')"
+                (click)="positionAddFromOC(index, 'CE', 'SELL')"
               />
             </td>
             <td>{{ optionChainStrike[index] }}</td>
@@ -58,13 +62,13 @@
                 type="submit"
                 value="B"
                 id="buy"
-                (click)="positionAddorRemove(index, 'PE', 'BUY')"
+                (click)="positionAddFromOC(index, 'PE', 'BUY')"
               />
               <input
                 type="submit"
                 value="S"
                 id="sell"
-                (click)="positionAddorRemove(index, 'PE', 'SELL')"
+                (click)="positionAddFromOC(index, 'PE', 'SELL')"
               />
             </td>
             <td>{{ pe[index] }}</td>
@@ -78,14 +82,13 @@
   <div id="right_block">
       <div id = "left_in_right_block">
 
-    <input type="submit" value="Add Position" (click)="addPosition()" />
-    <input type="submit" value="Add Existing Position (from dl)" (click)="addPosition()" />
-    <input type="submit" value="Add Dummy data" (click)="addTest()" />
+    <input type="submit" value="Add Existing Position (from dl)" (click)="addExistingPosition()" />
     <input type="submit" value="Clear All Positions" (click)="clearAllPositions()" />
     <!-- <input type="text" (keyup)="expectedProfit($event)" /> -->
     
     <table>
       <tr *ngIf='total>0'>
+        <th></th>
         <th></th>
         <th>Expiry</th>
         <th>Strike Price</th>
@@ -93,10 +96,13 @@
         <th>Lot</th>
         <th>Trade</th>
         <th></th>
+        <th>Max P</th>
+        <th>Max L</th>
       </tr>
       <tr *ngFor="let item of range(); let index = index">
+        <td id = {{isDuplicate[index]}}></td>
         <td>
-          <input type="checkbox" (change)="isSelectedRow(index)" checked />
+          <input type="checkbox" (change)="isCheckBoxEnable(index)" [checked] = "checked[index]" />
         </td>
 
         <td>
@@ -153,8 +159,16 @@
         <td>
           <input type="submit" value="X" (click)="deletePosition(index)" />
         </td>
+        <td id = 'max_profit'>{{max_profit[index]}}</td>
+        <td id = 'max_loss'>{{max_loss[index]}}</td>
       </tr>
     </table>
+
+    </div>
+    <div id = "right_in_right_block">
+        
+      
+     
 
     </div>
 
