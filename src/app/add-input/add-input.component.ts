@@ -270,17 +270,24 @@ export class AddInputComponent implements OnInit {
       duplicate_index = [... duplicate_index, ...value] //appending
     });
 
-    console.log(duplicate_index)
-    // for(let i:number = 0 ; i < this.total ; i ++){
-    //     if( duplicate_index .includes[i]){
-    //       this.isDuplicate[i] = true
-    //     }
-    //     else{
-    //       this.isDuplicate[i] = false
-    //     }
-    // }
+
+    //Set true value for duplicates
+    var flag = true
+    for(let i:number = 0 ; i < this.total ; i ++){
+      this.isDuplicate[i]=false
+      for(var dupli of duplicate_index){
+        if(dupli == i){
+          this.isDuplicate[i] = true
+          flag = false
+          break;
+        }
+      }
+      if(flag)
+        this.isDuplicate[i] = false
+    }
    
   }
+
 
   // Common functions for Positions table
 
@@ -317,8 +324,13 @@ export class AddInputComponent implements OnInit {
   //Call required calculations
   doCalculations(index: number){
 
+    //TODO:
     //1. calculatge margin & PL in single method
+    // return chart data (along with it) 
     // args: max_profit[index], max_loss[index] = [expiry[index], strike[index], pe_ce[index], lot[index], buy_sell[index]] | condition:[if index!=-1]
+    // get margin
+    // calculate table value like optionStrat
+    // add "refresh" method already added in html (is this need ?? we are doing 2min refresh right)
     this.calculateMargin();
   }
 
