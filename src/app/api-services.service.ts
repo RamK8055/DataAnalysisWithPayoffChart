@@ -22,6 +22,8 @@ export class ApiServicesService {
     })
   }
 
+
+
   public listExpiries(){
     const url = environment.apiEndPoint + '/expiries'
     return new Promise((resolve, reject) =>{
@@ -48,6 +50,16 @@ export class ApiServicesService {
         ce = JSON.parse(JSON.stringify(data)).CE
         strike = JSON.parse(JSON.stringify(data)).STRIKE
         resolve({strike, ce, pe});  
+      })
+    })
+  }
+
+
+  public getCalculations(body: any){
+    const url = environment.apiEndPoint + '/calculation'
+    return new Promise((resolve, reject) =>{
+      var result = this.httpClient.post(url,body).subscribe((data) =>{
+        resolve( JSON.stringify(data));  
       })
     })
   }
