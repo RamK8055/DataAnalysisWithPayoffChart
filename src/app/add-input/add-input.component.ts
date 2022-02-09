@@ -11,16 +11,16 @@ import { interval } from 'rxjs';  //For auto call method in every 'n' seconds
 })
 
 export class AddInputComponent implements OnInit {
-  
+
   expiryInDropDown: string[] = [];
   nifty: string = '';
-  position_size : number = 50;
+  position_size: number = 50;
 
   constructor(
     private apiService: ApiServicesService,
     private chartsService: ChartsService
   ) { }
-  
+
   ngOnInit(): void {
     this.getlistExpiries();
     this.getNifty();
@@ -28,16 +28,16 @@ export class AddInputComponent implements OnInit {
   }
 
   //For option chain
-  ce : number[] = []
-  pe : number[] = []
-  optionChainStrike : number[] = []
+  ce: number[] = []
+  pe: number[] = []
+  optionChainStrike: number[] = []
 
   selectedExpiry: string = ''
   //List data for positions
   total: number = 0
   expiry: string[] = []
   lot: number[] = []
-  pe_ce : string[] = []
+  pe_ce: string[] = []
   buy_sell: string[] = []
   strikeprice: number[] = []
   checked: boolean[] = []
@@ -49,14 +49,14 @@ export class AddInputComponent implements OnInit {
 
   //Resultant data 
   margin: string = '';
-  
+
   //For charting
   isLoading: boolean = false;
-  options : any = this.chartsService.getChartData()
+  options: any = this.chartsService.getChartData()
   testAns: string = ''
 
   //Update Option Chain every 2 min in Backend
-  mySubscription= interval(2 * 60 * 1000).subscribe((x =>{
+  mySubscription = interval(2 * 60 * 1000).subscribe((x => {
     console.log("Updating Option Chain")
     this.updateOptionChain()
     // TODO: call update method   '/updateoptionchain'
@@ -66,24 +66,24 @@ export class AddInputComponent implements OnInit {
   //---- PAGE ON LOAD ---//
 
   // Getting option chain data
-  getlistExpiries(){
-    this.apiService.listExpiries().then((data)=>{
+  getlistExpiries() {
+    this.apiService.listExpiries().then((data) => {
       this.expiryInDropDown = JSON.parse(JSON.stringify(data));
     })
   }
 
-  getNifty(){
-    this.apiService.getNifytValue().then((data)=>{
+  getNifty() {
+    this.apiService.getNifytValue().then((data) => {
       this.nifty = JSON.stringify(data);
     })
   }
 
   //--- Update the Option Chain every 2 min---//
-  updateOptionChain(){
+  updateOptionChain() {
     //TODO: 
     //Add a check box in html left top, if this is enable then call below method
     // invoke /updateOptionChain call
-    if(true){ //check box condition (by default it should false****)
+    if (true) { //check box condition (by default it should false****)
       //this.update().then((data)=>{this.getNifty()})
       this.getNifty();
     }
@@ -92,58 +92,58 @@ export class AddInputComponent implements OnInit {
   //---- Expiry change in drop down ---//
 
   //Changeing expiry in dropdown change the option chain
-  changeExpiry(event: any){
+  changeExpiry(event: any) {
     this.selectedExpiry = event.target.value;
     this.refreshCurrentExpiry()
   }
 
   //Refreshing the current expiry
-  refreshCurrentExpiry(){
+  refreshCurrentExpiry() {
     this.apiService.getOptionForExpiry(this.selectedExpiry, this.optionChainStrike, this.ce, this.pe)
-    .then((data)=>{
-      this.optionChainStrike = JSON.parse(JSON.stringify(data)).strike;
-      this.ce =  JSON.parse(JSON.stringify(data)).ce;
-      this.pe =  JSON.parse(JSON.stringify(data)).pe;
-    });
+      .then((data) => {
+        this.optionChainStrike = JSON.parse(JSON.stringify(data)).strike;
+        this.ce = JSON.parse(JSON.stringify(data)).ce;
+        this.pe = JSON.parse(JSON.stringify(data)).pe;
+      });
   }
 
 
   //--- Option chain activity ---//
 
   // Buy/Sell button on option chain
-  positionAddFromOC(index:number,pe_ce:string,buy_sell:string){
+  positionAddFromOC(index: number, pe_ce: string, buy_sell: string) {
     //TODO: move belwo all codes (in all funcition to serice class)
     var selectedPeCe;
     var premium;
-    if(pe_ce == 'PE'){
+    if (pe_ce == 'PE') {
       selectedPeCe = 'PE'
       premium = this.pe[index]
-      
-      if(buy_sell == 'BUY'){
+
+      if (buy_sell == 'BUY') {
         this.max_profit.push("-")
-        this.max_loss.push(Math.round(premium * this.position_size)+"")
+        this.max_loss.push(Math.round(premium * this.position_size) + "")
       }
-      else{
+      else {
         this.max_loss.push("-")
-        this.max_profit.push(Math.round(premium * this.position_size)+"")
+        this.max_profit.push(Math.round(premium * this.position_size) + "")
       }
     }
-    else{
+    else {
       selectedPeCe = 'CE'
       premium = this.ce[index]
-      
-      if(buy_sell == 'BUY'){
+
+      if (buy_sell == 'BUY') {
         this.max_profit.push("-")
-        this.max_loss.push(Math.round(premium * this.position_size)+"")
+        this.max_loss.push(Math.round(premium * this.position_size) + "")
       }
-      else{
+      else {
         this.max_loss.push("-")
-        this.max_profit.push(Math.round(premium * this.position_size)+"")
+        this.max_profit.push(Math.round(premium * this.position_size) + "")
       }
-      
+
     }
 
-    if(premium!=0){ 
+    if (premium != 0) {
       //TODO: this will only check in here, need this validation in all place (strike_dec, inc, exp change, pe_ce .. check)
       // Don't add 0 value premium
       var i = this.total;
@@ -156,84 +156,88 @@ export class AddInputComponent implements OnInit {
       this.checked.push(true)
       this.isDuplicate.push(false)
       this.total++
-      
+
       this.validateDuplicatePositions()
-      this.doCalculations(-1) 
+      this.doCalculations(i)
     }
-    
+
   }
-  
+
 
   //---- Functions for Positions ---//
 
   //Count of data in position table
-  range(){
+  range() {
     return new Array(this.total);
   }
 
   //Enable or disable the checkbox (don't delete but should not include: logic in backend)
-  isCheckBoxEnable(index:number){
-    if(this.checked[index])
+  isCheckBoxEnable(index: number) {
+    if (this.checked[index])
       this.checked[index] = false;
     else
       this.checked[index] = true;
-    
-    this.doCalculations(-1) //No need of doing PL
+
+    // uncheck 0 value premium
+    if (this.max_profit[index] == "0" || this.max_loss[index] == "0") {
+      this.checked[index] = false;
+    }
+    this.doCalculations(index) //No need of doing PL
 
   }
 
   //Change perticular positon's expiry
-  changePositionExpiry(event: any,index: number){
+  changePositionExpiry(event: any, index: number) {
     this.expiry[index] = event.target.value
     this.validateDuplicatePositions()
     this.doCalculations(index)
   }
 
   //Decrease the strike price
-  reduceStrike(index: number){
+  reduceStrike(index: number) {
     this.strikeprice[index] -= 50
     this.validateDuplicatePositions()
     this.doCalculations(index)
   }
 
   //Increase the strike price
-  increaseStrike(index: number){
-    this.strikeprice[index] = 50 + parseInt(this.strikeprice[index]+"") 
+  increaseStrike(index: number) {
+    this.strikeprice[index] = 50 + parseInt(this.strikeprice[index] + "")
     this.validateDuplicatePositions()
     this.doCalculations(index)
   }
 
   //Change Position's type (PE/CE)
-  changePositionType(index:number){
-    this.pe_ce[index] = (this.pe_ce[index]=='PE'?"CE":'PE')
+  changePositionType(index: number) {
+    this.pe_ce[index] = (this.pe_ce[index] == 'PE' ? "CE" : 'PE')
     this.validateDuplicatePositions()
     this.doCalculations(index)
   }
 
   //Decrease Lot
-  reduceLot(index: number){
-    if(this.lot[index]>1){
+  reduceLot(index: number) {
+    if (this.lot[index] > 1) {
       this.lot[index] -= 1
       this.doCalculations(index)
     }
   }
 
   //Increase Lot
-  increaseLot(index: number){
-    if(this.lot[index]<5){
+  increaseLot(index: number) {
+    if (this.lot[index] < 5) {
       this.lot[index] = 1 + this.lot[index]
       this.doCalculations(index)
     }
   }
 
   //Change Buy/Sell type
-  changePositionBuySell(index:number){
-    this.buy_sell[index] = (this.buy_sell[index]=='BUY'?"SELL":'BUY')
+  changePositionBuySell(index: number) {
+    this.buy_sell[index] = (this.buy_sell[index] == 'BUY' ? "SELL" : 'BUY')
     this.doCalculations(index)
   }
 
   //Delete position (row)
-  deletePosition(index: number){
+  deletePosition(index: number) {
     this.expiry.splice(index, 1)
     this.strikeprice.splice(index, 1)
     this.checked.splice(index, 1)
@@ -242,67 +246,67 @@ export class AddInputComponent implements OnInit {
     this.buy_sell.splice(index, 1)
     this.max_profit.splice(index, 1)
     this.max_loss.splice(index, 1)
-    this.isDuplicate.splice(index,1)
+    this.isDuplicate.splice(index, 1)
 
     this.total--;
-      
+
     this.validateDuplicatePositions()
     this.doCalculations(-1)
   }
 
   //Validate and list all duplicate position's index
-  validateDuplicatePositions(){
+  validateDuplicatePositions() {
     //Inner method to get dupliacate map
     function getDuplicates<T>(input: T[]): Map<T, number[]> {
       return input.reduce((output, element, idx) => {
-          const recordedDuplicates = output.get(element);
-          if (recordedDuplicates) {
-              output.set(element, [...recordedDuplicates, idx]);
-          } else if (input.lastIndexOf(element) !== idx) {
-              output.set(element, [idx]);
-          }
-  
-          return output;
+        const recordedDuplicates = output.get(element);
+        if (recordedDuplicates) {
+          output.set(element, [...recordedDuplicates, idx]);
+        } else if (input.lastIndexOf(element) !== idx) {
+          output.set(element, [idx]);
+        }
+
+        return output;
       }, new Map<T, number[]>());
     }
 
     var combined_position = [];
-    for(let i = 0; i< this.total ; i++){
-      combined_position.push(this.expiry[i]+" "+this.strikeprice[i]+" "+this.pe_ce[i])
+    for (let i = 0; i < this.total; i++) {
+      combined_position.push(this.expiry[i] + " " + this.strikeprice[i] + " " + this.pe_ce[i])
     }
 
     var dupliacate_map = getDuplicates(combined_position)
     var duplicate_index: any[] = []
 
-    dupliacate_map.forEach((value, key, map)=>{
-      duplicate_index = [... duplicate_index, ...value] //appending
+    dupliacate_map.forEach((value, key, map) => {
+      duplicate_index = [...duplicate_index, ...value] //appending
     });
 
 
     //Set true value for duplicates
     var flag = true
-    for(let i:number = 0 ; i < this.total ; i ++){
-      this.isDuplicate[i]=false
-      for(var dupli of duplicate_index){
-        if(dupli == i){
+    for (let i: number = 0; i < this.total; i++) {
+      this.isDuplicate[i] = false
+      for (var dupli of duplicate_index) {
+        if (dupli == i) {
           this.isDuplicate[i] = true
           flag = false
           break;
         }
       }
-      if(flag)
+      if (flag)
         this.isDuplicate[i] = false
     }
-   
+
   }
 
 
   // Common functions for Positions table
 
   // Clear all positions
-  clearAllPositions(){
+  clearAllPositions() {
     this.total = 0;
-    this.expiry= []
+    this.expiry = []
     this.lot = []
     this.pe_ce = []
     this.buy_sell = []
@@ -315,14 +319,14 @@ export class AddInputComponent implements OnInit {
   }
 
   // Example for event call in input change
-  expectedProfit(event: any){ 
+  expectedProfit(event: any) {
     //TODO: use same like this method and remove this
     var selectedValue = event.target.value;
   }
 
 
 
- 
+
 
 
 
@@ -330,7 +334,7 @@ export class AddInputComponent implements OnInit {
   //--- Calculations Part ---//
 
   //Call required calculations
-  doCalculations(index: number){
+  doCalculations(index: number) {
 
     //TODO:
     //1. calculatge margin & PL in single method
@@ -339,76 +343,103 @@ export class AddInputComponent implements OnInit {
     // get margin
     // calculate table value like optionStrat
     // add "refresh" method already added in html (is this need ?? we are doing 2min refresh right)
-    if(index!=-1)
+
+    //TODO: NOW
+    //profit_loss( strike, pe_ce, exp ) == 0 ? uncheck tick **** 
+    // After calculate preofit and loss only call margin*** 
+    if (index != -1)
       this.positionProfit(index)
-    this.calculateMargin();
+
+    // this.calculateMargin(); - put it inside positon profit (if posion p/l !=0 then call margin)
+
   }
 
-  positionProfit(index:number){
+  positionProfit(index: number) {
 
     var ce: number[] = []
     var pe: number[] = []
     var optionChainStrike: number[] = []
 
     // if(this.selectedExpiry !=this.expiry[index]){
+    if (index != -1) {
 
       this.apiService.getOptionForExpiry(this.expiry[index], optionChainStrike, ce, pe)
-      .then((data)=>{
-        optionChainStrike = JSON.parse(JSON.stringify(data)).strike;
-        ce =  JSON.parse(JSON.stringify(data)).ce;
-        pe =  JSON.parse(JSON.stringify(data)).pe;
-        
-        
-      //exp, strike, lot, pe_ce, buy_sell
-      var pos = optionChainStrike.indexOf((this.strikeprice[index]))
-      var premium:number = 0;
-      if(this.pe_ce[index] == 'PE'){
-        premium = pe[pos]
-        console.log("prem:"+premium)
-        if(this.buy_sell[index] == 'BUY'){
-          this.max_profit[index]="-"
-          this.max_loss[index]=(Math.round(premium * this.position_size * this.lot[index])+"")
-        }
-        else{
-          this.max_profit[index]=(Math.round(premium * this.position_size * this.lot[index])+"")
-          this.max_loss[index]="-"
-        }
-      }
-      else{
-        premium = ce[pos]
-        
-        if(this.buy_sell[index] == 'BUY'){
-          this.max_profit[index]= "-"
-          this.max_loss[index] = (Math.round(premium * this.position_size * this.lot[index])+"")
-        }
-        else{
-          this.max_profit[index]=(Math.round(premium * this.position_size * this.lot[index])+"")
-          this.max_loss[index] = "-"
-        }
-        
-      }
-  
-      console.log("////")
-      console.log(this.expiry[index])
-      console.log(this.lot[index])
-      console.log(this.pe_ce[index])
-      console.log(this.buy_sell[index])
-      console.log(this.strikeprice[index])
-      
+        .then((data) => {
+          optionChainStrike = JSON.parse(JSON.stringify(data)).strike;
+          ce = JSON.parse(JSON.stringify(data)).ce;
+          pe = JSON.parse(JSON.stringify(data)).pe;
 
-      console.log(optionChainStrike)
-      console.log(pos)
-      console.log((this.strikeprice[index]))
-      console.log(ce[pos])
-      console.log(pe[pos])
 
-    });
-    
-  // }
-    
+          //exp, strike, lot, pe_ce, buy_sell
+          var pos = optionChainStrike.indexOf((this.strikeprice[index]))
+          var premium: number = 0;
+          if (this.pe_ce[index] == 'PE') {
+            premium = pe[pos]
+            console.log("prem:" + premium)
+            if (this.buy_sell[index] == 'BUY') {
+              this.max_profit[index] = "-"
+              this.max_loss[index] = (Math.round(premium * this.position_size * this.lot[index]) + "")
+            }
+            else {
+              this.max_profit[index] = (Math.round(premium * this.position_size * this.lot[index]) + "")
+              this.max_loss[index] = "-"
+            }
+          }
+          else {
+            premium = ce[pos]
+
+            if (this.buy_sell[index] == 'BUY') {
+              this.max_profit[index] = "-"
+              this.max_loss[index] = (Math.round(premium * this.position_size * this.lot[index]) + "")
+            }
+            else {
+              this.max_profit[index] = (Math.round(premium * this.position_size * this.lot[index]) + "")
+              this.max_loss[index] = "-"
+            }
+
+          }
+
+          if (premium == 0) {
+            this.checked[index] = false
+          }
+
+          console.log("////")
+          // console.log(this.checked[index])
+          // console.log(this.expiry[index])
+          // console.log(this.lot[index])
+          // console.log(this.pe_ce[index])
+          // console.log(this.buy_sell[index])
+          // console.log(this.strikeprice[index])
+
+
+          // console.log(optionChainStrike)
+          // console.log(pos)
+          // console.log((this.strikeprice[index]))
+          // console.log(ce[pos])
+          // console.log(pe[pos])
+
+          console.log(this.checked)
+          console.log(this.expiry)
+          console.log(this.lot)
+          console.log(this.pe_ce)
+          console.log(this.buy_sell)
+          console.log(this.strikeprice)
+          console.log(this.max_profit)
+          console.log(this.max_loss)
+        });
+
+    }
+    else {
+      // do only margin calculation
+      // get chart data
+    }
+
+
+    // }
+
   }
 
-  calculateMargin(){
+  calculateMargin() {
     var param = {
       "checked": this.checked,
       "expiry": this.expiry,
@@ -417,21 +448,21 @@ export class AddInputComponent implements OnInit {
       "buy_sell": this.buy_sell,
       "strikeprice": this.strikeprice,
     }
-    
+
     console.log("===================================================")
     // console.log(param)
-    this.apiService.getCalculations(param).then((data)=>{
-      console.log(JSON.parse(JSON.stringify(data)))
+    this.apiService.getCalculations(param).then((data) => {
+      // console.log(JSON.parse(JSON.stringify(data)))
+      console.log(this.checked)
+      console.log(this.expiry)
+      console.log(this.lot)
+      console.log(this.pe_ce)
+      console.log(this.buy_sell)
+      console.log(this.strikeprice)
+      console.log(this.max_profit)
+      console.log(this.max_loss)
     })
 
-    // console.log(this.checked)
-    // console.log(this.expiry)
-    // console.log(this.lot)
-    // console.log(this.pe_ce)
-    // console.log(this.buy_sell)
-    // console.log(this.strikeprice)
-    // console.log(this.max_profit)
-    // console.log(this.max_loss)
   }
 
 
@@ -444,12 +475,12 @@ export class AddInputComponent implements OnInit {
 
 
   //---- Capture required Data ---// TODO: will use these method??
- 
-  getApiData(){
+
+  getApiData() {
 
     //Do validation if LTP of ce/pe is zero *******
 
-    var body = this.pe_ce+ " " + this.strikeprice + " " + this.lot;
+    var body = this.pe_ce + " " + this.strikeprice + " " + this.lot;
     // this.apiService.getApiData(body)
     //   .then((data)=>
     //   { 
@@ -459,7 +490,7 @@ export class AddInputComponent implements OnInit {
     // console.log(this.pe_ce+ " " + this.strikeprice + " " + this.lot)
   }
 
-  addExistingPosition(){
+  addExistingPosition() {
 
   }
 

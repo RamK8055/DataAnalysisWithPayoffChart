@@ -20,6 +20,7 @@
           </td>
           <td>
               <input type = 'submit' value = 'refresh' (click) = "refreshCurrentExpiry()"/> 
+              <!-- auto refreesh check box-->
           </td>
         </tr>
       </table>
@@ -102,7 +103,7 @@
       <tr *ngFor="let item of range(); let index = index">
         <td id = {{isDuplicate[index]}}></td>
         <td>
-          <input type="checkbox" (change)="isCheckBoxEnable(index)" [checked] = "checked[index]" />
+          <input type="checkbox" (change)="isCheckBoxEnable(index)" [checked] = "checked[index]"/>
         </td>
 
         <td>
