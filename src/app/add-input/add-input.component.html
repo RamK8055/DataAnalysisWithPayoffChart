@@ -83,7 +83,7 @@
   <div id="right_block">
       <div id = "left_in_right_block">
 
-    <input type="submit" value="Add Existing Position (from dl)" (click)="addExistingPosition()" />
+    <input type="submit" value="Add Existing Position " (click)="addExistingPosition()" />
     <input type="submit" value="Clear All Positions" (click)="clearAllPositions()" />
     <!-- <input type="text" (keyup)="expectedProfit($event)" /> -->
     
@@ -103,8 +103,8 @@
       <tr *ngFor="let item of range(); let index = index">
         <td id = {{isDuplicate[index]}}></td>
         <td>
-          <input type="checkbox" (change)="isCheckBoxEnable(index)" [checked] = "checked[index]"/>
-        </td>
+          <input type="checkbox" (change)="isCheckBoxEnable(index)" [checked] = "checked[index]" [disabled] = 'max_profit[index]=="0"||max_loss[index]=="0"'/>
+        </td> 
 
         <td>
           <select
@@ -173,9 +173,6 @@
 
     </div>
 
-    <!-- <div class="button-groups">
-    <button (click)="isLoading=!isLoading" nz-button nzType="default">Toggle Loading</button>
-</div>
-<div echarts [options]="options" [loading]="isLoading" theme="macarons" class="demo-chart"></div> -->
+<div echarts [options]="chartData" [loading]="isLoading" theme="macarons" class="demo-chart"></div> -
   </div>
 </div>

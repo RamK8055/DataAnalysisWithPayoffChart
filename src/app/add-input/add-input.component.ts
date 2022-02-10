@@ -44,6 +44,8 @@ export class AddInputComponent implements OnInit {
   max_profit: string[] = []
   max_loss: string[] = []
   isDuplicate: boolean[] = []
+  premium_price: number[] = [] //TODO: Add between( 'x', Max P)
+  farPercentage: number[] = []  //TODO: add next to PL in pos table
   //TODO: Add distance from underlying in percentage in pos table
   // OTM = green, atm = yellow, ITM = red
 
@@ -52,7 +54,8 @@ export class AddInputComponent implements OnInit {
 
   //For charting
   isLoading: boolean = false;
-  options: any = this.chartsService.getChartData()
+  // options: any = this.chartsService.getChartData()
+  chartData: any;
   testAns: string = ''
 
   //Update Option Chain every 2 min in Backend
@@ -144,8 +147,7 @@ export class AddInputComponent implements OnInit {
     }
 
     if (premium != 0) {
-      //TODO: this will only check in here, need this validation in all place (strike_dec, inc, exp change, pe_ce .. check)
-      // Don't add 0 value premium
+      // Don't add 0 value premium - for change in postion disabled the checkbox (when change from strike price)
       var i = this.total;
 
       this.expiry.push(this.selectedExpiry)
@@ -182,7 +184,7 @@ export class AddInputComponent implements OnInit {
     if (this.max_profit[index] == "0" || this.max_loss[index] == "0") {
       this.checked[index] = false;
     }
-    this.doCalculations(index) //No need of doing PL
+    this.doCalculations(index) 
 
   }
 
@@ -337,20 +339,14 @@ export class AddInputComponent implements OnInit {
   doCalculations(index: number) {
 
     //TODO:
-    //1. calculatge margin & PL in single method
+    //1. calculatge margin  (test with our having data - table paper)
     // return chart data (along with it) 
     // args: max_profit[index], max_loss[index] = [expiry[index], strike[index], pe_ce[index], lot[index], buy_sell[index]] | condition:[if index!=-1]
-    // get margin
     // calculate table value like optionStrat
     // add "refresh" method already added in html (is this need ?? we are doing 2min refresh right)
 
-    //TODO: NOW
-    //profit_loss( strike, pe_ce, exp ) == 0 ? uncheck tick **** 
-    // After calculate preofit and loss only call margin*** 
-    if (index != -1)
-      this.positionProfit(index)
+    this.positionProfit(index)
 
-    // this.calculateMargin(); - put it inside positon profit (if posion p/l !=0 then call margin)
 
   }
 
@@ -360,11 +356,14 @@ export class AddInputComponent implements OnInit {
     var pe: number[] = []
     var optionChainStrike: number[] = []
 
-    // if(this.selectedExpiry !=this.expiry[index]){
+    // if(this.selectedExpiry !=this.expiry[index]){ //TODO: put conditoin in future to avoid many api calls
     if (index != -1) {
 
       this.apiService.getOptionForExpiry(this.expiry[index], optionChainStrike, ce, pe)
         .then((data) => {
+          // console.log("=--------------=")
+          // console.log(JSON.stringify(data))
+          // console.log("=--------------=")
           optionChainStrike = JSON.parse(JSON.stringify(data)).strike;
           ce = JSON.parse(JSON.stringify(data)).ce;
           pe = JSON.parse(JSON.stringify(data)).pe;
@@ -375,7 +374,7 @@ export class AddInputComponent implements OnInit {
           var premium: number = 0;
           if (this.pe_ce[index] == 'PE') {
             premium = pe[pos]
-            console.log("prem:" + premium)
+            // console.log("prem:" + premium)
             if (this.buy_sell[index] == 'BUY') {
               this.max_profit[index] = "-"
               this.max_loss[index] = (Math.round(premium * this.position_size * this.lot[index]) + "")
@@ -403,7 +402,7 @@ export class AddInputComponent implements OnInit {
             this.checked[index] = false
           }
 
-          console.log("////")
+          // console.log("////")
           // console.log(this.checked[index])
           // console.log(this.expiry[index])
           // console.log(this.lot[index])
@@ -418,6 +417,7 @@ export class AddInputComponent implements OnInit {
           // console.log(ce[pos])
           // console.log(pe[pos])
 
+         /*
           console.log(this.checked)
           console.log(this.expiry)
           console.log(this.lot)
@@ -426,20 +426,26 @@ export class AddInputComponent implements OnInit {
           console.log(this.strikeprice)
           console.log(this.max_profit)
           console.log(this.max_loss)
+
+          */
+          //Calculate ChartData and margin
+          this.calculateChartDataMargin(); 
+
         });
 
     }
     else {
-      // do only margin calculation
-      // get chart data
+      //Calculate ChartData and margin
+      this.calculateChartDataMargin(); 
     }
 
-
+    //TODO: put checkbox to ask margin calculation is required or not (becasue margin will get by another api which may give delayed respones)
+        //add above boolean vvalue to backend and hanlde it in backend to enable margin calc
     // }
 
   }
 
-  calculateMargin() {
+  calculateChartDataMargin() {
     var param = {
       "checked": this.checked,
       "expiry": this.expiry,
@@ -447,20 +453,32 @@ export class AddInputComponent implements OnInit {
       "pe_ce": this.pe_ce,
       "buy_sell": this.buy_sell,
       "strikeprice": this.strikeprice,
+      "is_calculate_margin": false    // Will get from UI, when it enable only calculate margin (due to avoid delay response)
     }
 
-    console.log("===================================================")
     // console.log(param)
     this.apiService.getCalculations(param).then((data) => {
+      // console.log("===================================================")
       // console.log(JSON.parse(JSON.stringify(data)))
-      console.log(this.checked)
-      console.log(this.expiry)
-      console.log(this.lot)
-      console.log(this.pe_ce)
-      console.log(this.buy_sell)
-      console.log(this.strikeprice)
-      console.log(this.max_profit)
-      console.log(this.max_loss)
+
+      var any_obj:any= JSON.parse(JSON.stringify(data).toString())
+      var strike : any = JSON.parse( JSON.parse(JSON.parse(JSON.stringify(any_obj))).replaceAll("'",'"')).strike
+      var total : any = JSON.parse( JSON.parse(JSON.parse(JSON.stringify(any_obj))).replaceAll("'",'"')).total
+
+      // this.chartData = this.chartsService.getChartDataForSelectedPositions(JSON.parse(JSON.stringify(data)).strike,JSON.parse(JSON.stringify(data)).total )
+      this.chartData = this.chartsService.getChartDataForSelectedPositions(strike, total)
+      // console.log(JSON.parse(JSON.stringify(data)))
+      // console.log(JSON.parse( JSON.parse(JSON.parse(JSON.stringify(any_obj))).replaceAll("'",'"')))
+      // console.log("===")
+      // console.log(this.chartsService.getChartData())
+      // console.log(this.checked)
+      // console.log(this.expiry)
+      // console.log(this.lot)
+      // console.log(this.pe_ce)
+      // console.log(this.buy_sell)
+      // console.log(this.strikeprice)
+      // console.log(this.max_profit)
+      // console.log(this.max_loss)
     })
 
   }

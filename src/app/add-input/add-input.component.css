@@ -10,10 +10,11 @@
 
 #right_block{
     width:80%;
-}
-
-#left_in_right_block{
-  height: 650px;
+    float: right;
+  }
+  
+  #left_in_right_block{
+  height: 310px;
   overflow: auto;
   width: 48%;
 }
